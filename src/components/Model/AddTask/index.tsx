@@ -1,13 +1,13 @@
-import { ChangeEvent, useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
-import { useNavigate } from 'react-router-dom';
+import { ChangeEvent, useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
+import { useNavigate } from "react-router-dom";
 
-import { authAPI } from 'services/api/auth';
+import { authAPI } from "services/api/auth";
 
-import { appToaster } from 'utils/constants';
-import { ROUTES } from 'utils/constants/routes';
+import { appToaster } from "utils/constants";
+import { ROUTES } from "utils/constants/routes";
 
 interface IProps {
   show: boolean;
@@ -21,36 +21,37 @@ interface Developer {
 
 const AddTask: React.FC<IProps> = ({ show, setShow }) => {
   const [developers, setDevelopers] = useState<Developer[]>([]);
-  const [selectedDeveloperId, setSelectedDeveloperId] = useState<string>('');
-  const [title, setTitle] = useState('');
+  const [selectedDeveloperId, setSelectedDeveloperId] = useState<string>("");
+  const [title, setTitle] = useState("");
   const navigate = useNavigate();
 
   const onSubmit = async () => {
-    const value: any = localStorage.getItem('userDemoAppDev'); // Replace 'myKey' with your key
+    const value: any = localStorage.getItem("userDemoAppDev"); // Replace 'myKey' with your key
 
     const finalValue = JSON.parse(value);
 
+    if (title?.length >= 30) {
+      appToaster("success", "You can only write 30 characters for the task");
+
+      return false;
+    }
+
     const addTaskObj: any = {
       title: title,
-      status: 'todo',
+      status: "todo",
       developerId: finalValue.developerId,
-      assignedTo: selectedDeveloperId || ''
+      assignedTo: selectedDeveloperId || "",
     };
     try {
       const res: any = await authAPI.addTask(addTaskObj);
-      console.log('res: ', res);
 
-      appToaster('success', res.message);
-
-      console.log('res.message: ', res.message);
+      appToaster("success", res.message);
 
       setTimeout(() => window.location.reload(), 1000); // Reload the page after a short delay
 
       navigate(ROUTES.dashboard);
     } catch (error: any) {
-      // setToastMessage(error.message);
-      // setToastType('error');
-      // setShowToast(true);
+      appToaster("error", error.message);
     }
   };
 
@@ -67,7 +68,7 @@ const AddTask: React.FC<IProps> = ({ show, setShow }) => {
         setDevelopers(res.data.taskList); // Set the developer list
         setSelectedDeveloperId(res.data.taskList[0]._id); // Set the default selected developer
       } catch (error) {
-        console.error('Error fetching developers:', error);
+        console.error("Error fetching developers:", error);
       }
     };
 
@@ -90,7 +91,9 @@ const AddTask: React.FC<IProps> = ({ show, setShow }) => {
               placeholder="Enter task title"
               required
               value={title}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setTitle(e.target.value)
+              }
             />
           </Form.Group>
 

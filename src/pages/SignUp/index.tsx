@@ -1,19 +1,19 @@
-import { Wrapper } from './style';
-import { ChangeEvent, useState } from 'react';
-import { Button, Toast, ToastContainer } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { authAPI } from 'services/api/auth';
-import { ROUTES } from 'utils/constants/routes';
+import { Wrapper } from "./style";
+import { ChangeEvent, useState } from "react";
+import { Button, Toast, ToastContainer } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { authAPI } from "services/api/auth";
+import { ROUTES } from "utils/constants/routes";
 
 const SignUp: React.FC = () => {
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [countryCode, setCountryCode] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [countryCode, setCountryCode] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [showToast, setShowToast] = useState<boolean>(false);
-  const [toastMessage, setToastMessage] = useState<string>('');
-  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [toastMessage, setToastMessage] = useState<string>("");
+  const [toastType, setToastType] = useState<"success" | "error">("success");
   const navigate = useNavigate();
 
   const onSubmit = async (e: any) => {
@@ -23,21 +23,19 @@ const SignUp: React.FC = () => {
       email: email,
       phoneNumber: phoneNumber,
       countryCode: countryCode,
-      password: password
+      password: password,
     };
     try {
       const res: any = await authAPI.signUp(item);
-      console.log('res: ', res);
 
-      console.log('res.message: ', res.message);
       setToastMessage(res.message);
-      setToastType('success');
+      setToastType("success");
       setShowToast(true);
 
       navigate(ROUTES.dashboard);
     } catch (error: any) {
       setToastMessage(error.message);
-      setToastType('error');
+      setToastType("error");
       setShowToast(true);
     }
   };
@@ -60,7 +58,9 @@ const SignUp: React.FC = () => {
                 name="name"
                 required
                 value={name}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setName(e.target.value)
+                }
               />
             </div>
             <div className="form-group">
@@ -71,7 +71,9 @@ const SignUp: React.FC = () => {
                 name="email"
                 required
                 value={email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
+                }
               />
             </div>
             <div className="form-group">
@@ -82,7 +84,9 @@ const SignUp: React.FC = () => {
                 name="phoneNumber"
                 required
                 value={phoneNumber}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setPhoneNumber(e.target.value)
+                }
               />
             </div>
             <div className="form-group">
@@ -93,7 +97,9 @@ const SignUp: React.FC = () => {
                 name="countryCode"
                 required
                 value={countryCode}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setCountryCode(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setCountryCode(e.target.value)
+                }
               />
             </div>
             <div className="form-group">
@@ -104,7 +110,9 @@ const SignUp: React.FC = () => {
                 name="password"
                 required
                 value={password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
               />
             </div>
             <button type="submit" className="register-button">
@@ -118,7 +126,11 @@ const SignUp: React.FC = () => {
             <Toast
               show={showToast}
               onClose={() => setShowToast(false)}
-              className={toastType === 'success' ? 'custom-toast-success' : 'custom-toast-error'}
+              className={
+                toastType === "success"
+                  ? "custom-toast-success"
+                  : "custom-toast-error"
+              }
               delay={3000}
               autohide
             >

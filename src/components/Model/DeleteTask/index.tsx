@@ -1,8 +1,9 @@
 // DeleteTask.tsx
-import React from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import React from "react";
+import { Button, Modal } from "react-bootstrap";
 
-import { authAPI } from 'services/api/auth';
+import { authAPI } from "services/api/auth";
+import { appToaster } from "utils/constants";
 
 interface DeleteTaskProps {
   taskId: string;
@@ -10,14 +11,21 @@ interface DeleteTaskProps {
   onDeleteSuccess: () => void;
 }
 
-const DeleteTask: React.FC<DeleteTaskProps> = ({ taskId, onClose, onDeleteSuccess }) => {
+const DeleteTask: React.FC<DeleteTaskProps> = ({
+  taskId,
+  onClose,
+  onDeleteSuccess,
+}) => {
   const handleDelete = async () => {
     try {
-      await authAPI.deleteTask({ _id: taskId } as never); // Replace with your actual API call
+      const res: any = await authAPI.deleteTask({ _id: taskId } as never); // Replace with your actual API call
       onDeleteSuccess(); // Notify parent component about the successful deletion
-      setTimeout(() => window.location.reload(), 500); // Reload the page after a short delay
-    } catch (error) {
-      console.error('Error deleting task:', error);
+      setTimeout(() => window.location.reload(), 1000); // Reload the page after a short delay
+
+      appToaster("success", res.message);
+    } catch (error: any) {
+      console.error("Error deleting task:", error);
+      appToaster("error", error.message);
     } finally {
       onClose(); // Close the modal
     }

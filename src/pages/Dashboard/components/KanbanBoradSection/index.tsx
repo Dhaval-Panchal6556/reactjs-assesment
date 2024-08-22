@@ -16,6 +16,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import DeleteTask from "components/Model/DeleteTask";
 
 import { authAPI } from "services/api/auth";
+import { appToaster } from "utils/constants";
 
 // Define the Task interface
 interface Task {
@@ -25,6 +26,8 @@ interface Task {
   assignedTo: string;
   assignedId: string;
   assignedName: string;
+  inProgressDate: string;
+  completedDate: string;
 }
 
 interface Developer {
@@ -87,11 +90,8 @@ const KanbanBoard: React.FC = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
-      console.log("now: ", now);
-      console.log('tasks: ', tasks);
       const updatedTasks = tasks.map((task: any) => {
         if (task.status === "inProgress" && task.inProgressDate) {
-          console.log("task.inProgressDate: ", task.inProgressDate);
           const taskAge =
             (now.getTime() - new Date(task.inProgressDate).getTime()) / 1000; // Time in seconds
           if (taskAge > 120) {
@@ -103,8 +103,6 @@ const KanbanBoard: React.FC = () => {
 
         // Move expired tasks to archived after 2 more minutes (4 minutes total)
         if (task.status === "expired" && task.expiredDate) {
-          console.log('task.status: ', task.status);
-          console.log('task.expiredDate: ', task.expiredDate);
           const expiredAge =
             (now.getTime() - new Date(task.expiredDate).getTime()) / 1000;
           if (expiredAge > 120) {
@@ -128,7 +126,6 @@ const KanbanBoard: React.FC = () => {
         _id: taskId,
         status: newStatus,
       });
-      console.log("Task updated successfully");
       setTimeout(() => window.location.reload(), 1000); // Reload the page after a short delay
     } catch (error) {
       console.error("Error updating task:", error);
@@ -151,7 +148,7 @@ const KanbanBoard: React.FC = () => {
 
     // Prevent moving expired tasks
     if (draggedTask.status === "expired") {
-      console.log("Expired tasks cannot be moved.");
+      appToaster("success", "Expired tasks cannot be moved");
       return;
     }
 
@@ -165,8 +162,9 @@ const KanbanBoard: React.FC = () => {
       draggedTask.status === "todo" &&
       updatedTasks[0].status === "completed"
     ) {
-      console.log(
-        "First of all you can move task inProgress and then you can move completed task"
+      appToaster(
+        "success",
+        "First, you can move the task to 'In Progress', and then you can move it to 'Completed"
       );
       return;
     }
@@ -178,7 +176,6 @@ const KanbanBoard: React.FC = () => {
 
   // Open modal when task is clicked
   const handleTaskClick = (task: Task) => {
-    console.log("task: ", task);
     setSelectedTask(task);
     setSelectedDeveloper(task.assignedId); // Set the selected developer
     setShowModal(true);
@@ -197,11 +194,9 @@ const KanbanBoard: React.FC = () => {
   // Handle updating task details in modal
   const handleUpdateTask = async (developerId: string) => {
     if (selectedTask) {
-      console.log("selectedTask: ", selectedTask);
       const value = JSON.parse(localStorage.getItem("userDemoAppDev") as never);
 
       if (selectedTask.status && value.developerId != developerId) {
-        console.log("log", selectedTask.status, value.developerId, developerId);
 
         await authAPI.updateTaskDetails({
           _id: selectedTask._id,
@@ -219,7 +214,6 @@ const KanbanBoard: React.FC = () => {
         setShowModal(false);
         setTimeout(() => window.location.reload(), 1000); // Reload the page after a short delay
       } else {
-        console.log("second cond called");
 
         await authAPI.updateTaskDetails({
           _id: selectedTask._id,
@@ -242,9 +236,7 @@ const KanbanBoard: React.FC = () => {
 
   // Handle input change for task fields
   const handleChange = (e: any) => {
-    console.log("e: ", e.target.value);
     if (selectedTask) {
-      console.log("selectedTask: ", selectedTask);
       setSelectedTask({ ...selectedTask, [e.target.name]: e.target.value });
     }
   };
@@ -355,6 +347,7 @@ const KanbanBoard: React.FC = () => {
                     }
                   />
                 </Form.Group>
+
                 <Form.Group className="mb-3" controlId="formTaskStatus">
                   <Form.Label>Status</Form.Label>
                   <Form.Control
@@ -371,6 +364,45 @@ const KanbanBoard: React.FC = () => {
                     <option value="expired">Expired</option>
                   </Form.Control>
                 </Form.Group>
+
+                {selectedTask.status === "inProgress" && (
+                  <Form.Group className="mb-3" controlId="formInProgressDate">
+                    <Form.Label>In Progress Date</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={new Date(
+                        selectedTask.inProgressDate
+                      ).toLocaleString()}
+                      readOnly
+                    />
+                  </Form.Group>
+                )}
+
+                {selectedTask.status === "completed" && (
+                  <>
+                    <Form.Group className="mb-3" controlId="formInProgressDate">
+                      <Form.Label>In Progress Date</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={new Date(
+                          selectedTask.inProgressDate
+                        ).toLocaleString()}
+                        readOnly
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="formCompletedDate">
+                      <Form.Label>Completed Date</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={new Date(
+                          selectedTask.completedDate
+                        ).toLocaleString()}
+                        readOnly
+                      />
+                    </Form.Group>
+                  </>
+                )}
+
                 <Form.Group className="mb-3" controlId="formAssignedTo">
                   <Form.Label>Assigned To</Form.Label>
                   <Form.Control

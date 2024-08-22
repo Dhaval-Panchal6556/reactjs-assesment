@@ -26,7 +26,6 @@ export const authAPI = {
     return apiInstance
       .post(ApiEndPoints.auth.signIn, data)
       .then((response) => {
-        console.log('response: ', response);
         store.dispatch(authSuccess(response));
         return response;
       })

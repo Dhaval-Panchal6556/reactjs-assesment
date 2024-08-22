@@ -1,13 +1,14 @@
-import { Wrapper } from './style';
+import { Wrapper } from "./style";
 
-import { useState } from 'react';
-import { Button, Container, Form, Nav, Navbar } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useState } from "react";
+import { Button, Container, Form, Nav, Navbar } from "react-bootstrap";
+import { useDispatch } from "react-redux";
 
-import AddTask from 'components/Model/AddTask';
-import ArchivedTasks from 'components/Model/ArchivedTask';
+import AddTask from "components/Model/AddTask";
+import ArchivedTasks from "components/Model/ArchivedTask";
 
-import { authFail } from 'services/redux/AuthSlice';
+import { authFail } from "services/redux/AuthSlice";
+import { appToaster } from "utils/constants";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -15,10 +16,11 @@ const Header = () => {
   const [showArchivedTasks, setShowArchivedTasks] = useState(false); // State for ArchivedTasks modal
 
   // Fetch the username from localStorage
-  const username = JSON.parse(localStorage.getItem('userDemoAppDev') as never);
+  const username = JSON.parse(localStorage.getItem("userDemoAppDev") as never);
 
   const onLogout = () => {
     dispatch(authFail());
+    appToaster("success", "Logout successfully");
   };
 
   return (
@@ -33,7 +35,10 @@ const Header = () => {
             </Nav>
 
             <Nav className="me-auto archived_button">
-              <Button variant="light" onClick={() => setShowArchivedTasks(true)}>
+              <Button
+                variant="light"
+                onClick={() => setShowArchivedTasks(true)}
+              >
                 Archived List
               </Button>
             </Nav>
@@ -58,7 +63,10 @@ const Header = () => {
       </div>
       {showAddTask && <AddTask show={showAddTask} setShow={setShowAddTask} />}
       {showArchivedTasks && (
-        <ArchivedTasks show={showArchivedTasks} setShow={setShowArchivedTasks} />
+        <ArchivedTasks
+          show={showArchivedTasks}
+          setShow={setShowArchivedTasks}
+        />
       )}
     </Wrapper>
   );

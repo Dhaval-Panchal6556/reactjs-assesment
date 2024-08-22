@@ -1,43 +1,44 @@
-import { Wrapper } from './style';
+import { Wrapper } from "./style";
 
-import { ChangeEvent, useState } from 'react';
-import { Toast, ToastContainer } from 'react-bootstrap';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { ChangeEvent, useState } from "react";
+import { Toast, ToastContainer } from "react-bootstrap";
+import { Navigate, useNavigate } from "react-router-dom";
 
-import Meta from 'components/common/Meta';
+import Meta from "components/common/Meta";
 
-import { authAPI } from 'services/api/auth';
-import { useAppSelector } from 'services/redux/store';
+import { authAPI } from "services/api/auth";
+import { useAppSelector } from "services/redux/store";
 
-import { ROUTES } from 'utils/constants/routes';
+import { ROUTES } from "utils/constants/routes";
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAppSelector((state) => state.auth);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [toastMessage, setToastMessage] = useState<string>('');
-  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [toastMessage, setToastMessage] = useState<string>("");
+  const [toastType, setToastType] = useState<"success" | "error">("success");
   const [showToast, setShowToast] = useState<boolean>(false);
 
-  console.log('isLoggedIn: ', isLoggedIn);
+  console.log("isLoggedIn: ", isLoggedIn);
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const res: any = await authAPI.signIn({ email: email, password: password });
-      console.log('res: ', res);
+      const res: any = await authAPI.signIn({
+        email: email,
+        password: password,
+      });
 
-      console.log('res.message: ', res.message);
       setToastMessage(res.message);
-      setToastType('success');
+      setToastType("success");
       setShowToast(true);
       navigate(ROUTES.dashboard);
     } catch (error: any) {
-      console.log('error: ', error);
+      console.log("error: ", error);
       setToastMessage(error.message);
-      setToastType('error');
+      setToastType("error");
       setShowToast(true);
     }
     [navigate];
@@ -47,9 +48,11 @@ const SignIn: React.FC = () => {
     return <Navigate to={ROUTES.dashboard} />;
   }
 
-  const redirectRegisterPage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const redirectRegisterPage = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
-    navigate('/register');
+    navigate("/register");
   };
 
   return (
@@ -70,7 +73,9 @@ const SignIn: React.FC = () => {
                     id="email"
                     className="form-control"
                     value={email}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setEmail(e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -83,12 +88,18 @@ const SignIn: React.FC = () => {
                     id="password"
                     className="form-control"
                     value={password}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setPassword(e.target.value)
+                    }
                     required
                   />
                 </div>
-                <button type="submit" className="btn btn-primary w-100" disabled={isSubmitting}>
-                  {isSubmitting ? 'Logging in...' : 'Login'}
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Logging in..." : "Login"}
                 </button>
                 <br />
                 <br />
@@ -100,12 +111,17 @@ const SignIn: React.FC = () => {
                   Register
                 </button>
               </form>
-              <ToastContainer position="top-end" className="p-3 toast-container">
+              <ToastContainer
+                position="top-end"
+                className="p-3 toast-container"
+              >
                 <Toast
                   show={showToast}
                   onClose={() => setShowToast(false)}
                   className={
-                    toastType === 'success' ? 'custom-toast-success' : 'custom-toast-error'
+                    toastType === "success"
+                      ? "custom-toast-success"
+                      : "custom-toast-error"
                   }
                   delay={3000}
                   autohide

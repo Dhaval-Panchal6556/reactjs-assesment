@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
 
 import { authAPI } from "services/api/auth";
+import { appToaster } from "utils/constants";
 
 interface ArchivedTasksProps {
   show: boolean;
@@ -16,7 +17,6 @@ const ArchivedTasks: React.FC<ArchivedTasksProps> = ({ show, setShow }) => {
 
   const getList = useCallback(async () => {
     try {
-      console.log("page: ", page);
       // Fetch archived tasks from the API
       const response: any = await authAPI.archivedTaskListTask({
         page: page + 1, // Correct page number for the API (if API uses 1-based indexing)
@@ -24,13 +24,12 @@ const ArchivedTasks: React.FC<ArchivedTasksProps> = ({ show, setShow }) => {
       }); // Replace with actual API endpoint
 
       const taskList = response.data.archivedList;
-      console.log("taskList: ", taskList);
 
-      console.log("response.data.total_records: ", response.data.total_records);
       setArchivedTasks(taskList);
       setCount(response.data.total_records);
-    } catch (error) {
-      console.error("Error fetching archived tasks:", error);
+      appToaster("success", response.message);
+    } catch (error: any) {
+      appToaster("error", error.message);
     }
   }, [page]);
 
@@ -39,7 +38,6 @@ const ArchivedTasks: React.FC<ArchivedTasksProps> = ({ show, setShow }) => {
   }, [getList]);
 
   const getStartIndex = () => page * size + 1;
-  console.log("getStartIndex: ", getStartIndex());
   const totalPages = Math.ceil(count / size);
 
   const handlePageChange = (newPage: number) => {
