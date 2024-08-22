@@ -8,6 +8,7 @@ import { appLoader } from 'utils/functions';
 import apiInstance from '..';
 import {
   IAddTaskReq,
+  IArchivedListTaskReq,
   IDeleteTaskReq,
   IDeveloperListReq,
   IListTaskReq,
@@ -73,6 +74,26 @@ export const authAPI = {
     appLoader(true);
     return apiInstance
       .post(ApiEndPoints.task.taskList, data, {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(
+            localStorage.getItem('authTokenDemoAppDev') as never
+          )}`
+        }
+      })
+      .then((response) => {
+        // store.dispatch(authSuccess(response));
+        return response;
+      })
+      .catch((error) => {
+        throw error?.response?.data;
+      })
+      .finally(() => appLoader(false));
+  },
+
+  async archivedTaskListTask(data: IArchivedListTaskReq) {
+    appLoader(true);
+    return apiInstance
+      .post(ApiEndPoints.task.archivedTaskList, data, {
         headers: {
           Authorization: `Bearer ${JSON.parse(
             localStorage.getItem('authTokenDemoAppDev') as never

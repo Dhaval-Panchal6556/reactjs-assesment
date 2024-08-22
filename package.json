@@ -6,7 +6,7 @@
   "type": "module",
   "license": "UNLICENSED",
   "scripts": {
-    "start": "npm run prettier && vite",
+    "start": "vite",
     "build": "tsc && vite build --mode development",
     "build:prod": "tsc && vite build --mode production",
     "test": "vitest run && vitest --ui",

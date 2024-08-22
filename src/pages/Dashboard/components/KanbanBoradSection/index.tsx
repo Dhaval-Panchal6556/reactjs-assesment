@@ -1,19 +1,27 @@
-import { Wrapper } from './style';
+import { Wrapper } from "./style";
 
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Button, Card, Col, Container, Form, Modal, Row } from 'react-bootstrap';
-import { AiOutlineClose } from 'react-icons/ai';
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Modal,
+  Row,
+} from "react-bootstrap";
+import { AiOutlineClose } from "react-icons/ai";
 
-import DeleteTask from 'components/Model/DeleteTask';
+import DeleteTask from "components/Model/DeleteTask";
 
-import { authAPI } from 'services/api/auth';
+import { authAPI } from "services/api/auth";
 
 // Define the Task interface
 interface Task {
   _id: string;
   title: string;
-  status: 'todo' | 'inProgress' | 'completed' | 'expired';
+  status: "todo" | "inProgress" | "completed" | "expired";
   assignedTo: string;
   assignedId: string;
   assignedName: string;
@@ -29,7 +37,7 @@ const KanbanBoard: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null); // State for selected task
   const [showModal, setShowModal] = useState(false); // State to control modal visibility
   const [developers, setDevelopers] = useState<Developer[]>([]);
-  const [selectedDeveloper, setSelectedDeveloper] = useState<string>(''); // State for selected developer
+  const [selectedDeveloper, setSelectedDeveloper] = useState<string>(""); // State for selected developer
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskIdToDelete, setTaskIdToDelete] = useState<string | null>(null);
 
@@ -40,14 +48,26 @@ const KanbanBoard: React.FC = () => {
         const response = await authAPI.listTask({ page: 1, limit: 100 }); // Replace with actual API endpoint
         const taskList = response.data.taskList[0];
         const fetchedTasks: Task[] = [
-          ...taskList.todoTasks.map((task: any) => ({ ...task, status: 'todo' })),
-          ...taskList.inProgressTasks.map((task: any) => ({ ...task, status: 'inProgress' })),
-          ...taskList.completedTasks.map((task: any) => ({ ...task, status: 'completed' })),
-          ...taskList.expiredTasks.map((task: any) => ({ ...task, status: 'expired' }))
+          ...taskList.todoTasks.map((task: any) => ({
+            ...task,
+            status: "todo",
+          })),
+          ...taskList.inProgressTasks.map((task: any) => ({
+            ...task,
+            status: "inProgress",
+          })),
+          ...taskList.completedTasks.map((task: any) => ({
+            ...task,
+            status: "completed",
+          })),
+          ...taskList.expiredTasks.map((task: any) => ({
+            ...task,
+            status: "expired",
+          })),
         ];
         setTasks(fetchedTasks);
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        console.error("Error fetching tasks:", error);
       }
     };
 
@@ -56,7 +76,7 @@ const KanbanBoard: React.FC = () => {
         const res = await authAPI.developerList({ page: 1, limit: 10 }); // Replace with actual API call
         setDevelopers(res.data.taskList); // Set the developer list
       } catch (error) {
-        console.error('Error fetching developers:', error);
+        console.error("Error fetching developers:", error);
       }
     };
 
@@ -67,15 +87,30 @@ const KanbanBoard: React.FC = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
-      console.log('now: ', now);
+      console.log("now: ", now);
+      console.log('tasks: ', tasks);
       const updatedTasks = tasks.map((task: any) => {
-        if (task.status === 'inProgress' && task.inProgressDate) {
-          console.log('task.inProgressDate: ', task.inProgressDate);
-          const taskAge = (now.getTime() - new Date(task.inProgressDate).getTime()) / 1000; // Time in seconds
+        if (task.status === "inProgress" && task.inProgressDate) {
+          console.log("task.inProgressDate: ", task.inProgressDate);
+          const taskAge =
+            (now.getTime() - new Date(task.inProgressDate).getTime()) / 1000; // Time in seconds
           if (taskAge > 120) {
             // 2 minutes
-            updateTaskStatus(task._id, 'expired');
-            return { ...task, status: 'expired' };
+            updateTaskStatus(task._id, "expired");
+            return { ...task, status: "expired" };
+          }
+        }
+
+        // Move expired tasks to archived after 2 more minutes (4 minutes total)
+        if (task.status === "expired" && task.expiredDate) {
+          console.log('task.status: ', task.status);
+          console.log('task.expiredDate: ', task.expiredDate);
+          const expiredAge =
+            (now.getTime() - new Date(task.expiredDate).getTime()) / 1000;
+          if (expiredAge > 120) {
+            // 2 more minutes after expiring
+            updateTaskStatus(task._id, "archived");
+            return { ...task, status: "archived" };
           }
         }
         return task;
@@ -91,12 +126,12 @@ const KanbanBoard: React.FC = () => {
     try {
       await authAPI.updateTask({
         _id: taskId,
-        status: newStatus
+        status: newStatus,
       });
-      console.log('Task updated successfully');
-      setTimeout(() => window.location.reload(), 500); // Reload the page after a short delay
+      console.log("Task updated successfully");
+      setTimeout(() => window.location.reload(), 1000); // Reload the page after a short delay
     } catch (error) {
-      console.error('Error updating task:', error);
+      console.error("Error updating task:", error);
     }
   };
 
@@ -105,24 +140,34 @@ const KanbanBoard: React.FC = () => {
     const { source, destination } = result;
 
     if (!destination) return;
-    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
       return;
     }
 
     const draggedTask = tasks[source.index];
 
     // Prevent moving expired tasks
-    if (draggedTask.status === 'expired') {
-      console.log('Expired tasks cannot be moved.');
+    if (draggedTask.status === "expired") {
+      console.log("Expired tasks cannot be moved.");
       return;
     }
 
     const updatedTasks = tasks.map((task) =>
-      task._id === draggedTask._id ? { ...task, status: destination.droppableId } : task
+      task._id === draggedTask._id
+        ? { ...task, status: destination.droppableId }
+        : task
     );
 
-    if (draggedTask.status === 'todo' && updatedTasks[0].status === 'completed') {
-      console.log('First of all you can move task inProgress and then you can move completed task');
+    if (
+      draggedTask.status === "todo" &&
+      updatedTasks[0].status === "completed"
+    ) {
+      console.log(
+        "First of all you can move task inProgress and then you can move completed task"
+      );
       return;
     }
 
@@ -133,7 +178,7 @@ const KanbanBoard: React.FC = () => {
 
   // Open modal when task is clicked
   const handleTaskClick = (task: Task) => {
-    console.log('task: ', task);
+    console.log("task: ", task);
     setSelectedTask(task);
     setSelectedDeveloper(task.assignedId); // Set the selected developer
     setShowModal(true);
@@ -152,39 +197,75 @@ const KanbanBoard: React.FC = () => {
   // Handle updating task details in modal
   const handleUpdateTask = async (developerId: string) => {
     if (selectedTask) {
-      await authAPI.updateTaskDetails({
-        _id: selectedTask._id,
-        title: selectedTask.title,
-        status: selectedTask.status,
-        assignedTo: developerId // Use the selected developer ID
-      });
+      console.log("selectedTask: ", selectedTask);
+      const value = JSON.parse(localStorage.getItem("userDemoAppDev") as never);
 
-      const updatedTasks = tasks.map((task) =>
-        task._id === selectedTask._id ? { ...task, assignedId: developerId } : task
-      );
-      setTasks(updatedTasks);
-      setShowModal(false);
-      setTimeout(() => window.location.reload(), 500); // Reload the page after a short delay
+      if (selectedTask.status && value.developerId != developerId) {
+        console.log("log", selectedTask.status, value.developerId, developerId);
+
+        await authAPI.updateTaskDetails({
+          _id: selectedTask._id,
+          title: selectedTask.title,
+          status: "todo",
+          assignedTo: developerId, // Use the selected developer ID
+        });
+
+        const updatedTasks = tasks.map((task) =>
+          task._id === selectedTask._id
+            ? { ...task, assignedId: developerId }
+            : task
+        );
+        setTasks(updatedTasks);
+        setShowModal(false);
+        setTimeout(() => window.location.reload(), 1000); // Reload the page after a short delay
+      } else {
+        console.log("second cond called");
+
+        await authAPI.updateTaskDetails({
+          _id: selectedTask._id,
+          title: selectedTask.title,
+          status: selectedTask.status,
+          assignedTo: developerId, // Use the selected developer ID
+        });
+
+        const updatedTasks = tasks.map((task) =>
+          task._id === selectedTask._id
+            ? { ...task, assignedId: developerId }
+            : task
+        );
+        setTasks(updatedTasks);
+        setShowModal(false);
+        setTimeout(() => window.location.reload(), 1000); // Reload the page after a short delay
+      }
     }
   };
 
   // Handle input change for task fields
   const handleChange = (e: any) => {
-    console.log('e: ', e.target.value);
+    console.log("e: ", e.target.value);
     if (selectedTask) {
-      console.log('selectedTask: ', selectedTask);
+      console.log("selectedTask: ", selectedTask);
       setSelectedTask({ ...selectedTask, [e.target.name]: e.target.value });
     }
   };
 
   const columns = {
-    todo: { name: 'To-do', tasks: tasks.filter((task) => task.status === 'todo') },
-    inProgress: {
-      name: 'In Progress',
-      tasks: tasks.filter((task) => task.status === 'inProgress')
+    todo: {
+      name: "To-do",
+      tasks: tasks.filter((task) => task.status === "todo"),
     },
-    completed: { name: 'Completed', tasks: tasks.filter((task) => task.status === 'completed') },
-    expired: { name: 'Expired', tasks: tasks.filter((task) => task.status === 'expired') }
+    inProgress: {
+      name: "In Progress",
+      tasks: tasks.filter((task) => task.status === "inProgress"),
+    },
+    completed: {
+      name: "Completed",
+      tasks: tasks.filter((task) => task.status === "completed"),
+    },
+    expired: {
+      name: "Expired",
+      tasks: tasks.filter((task) => task.status === "expired"),
+    },
   };
 
   return (
@@ -200,13 +281,21 @@ const KanbanBoard: React.FC = () => {
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`droppable-col ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
+                      className={`droppable-col ${
+                        snapshot.isDraggingOver ? "dragging-over" : ""
+                      }`}
                     >
                       {column.tasks.map((task, index) => (
-                        <Draggable key={task._id} draggableId={task._id.toString()} index={index}>
+                        <Draggable
+                          key={task._id}
+                          draggableId={task._id.toString()}
+                          index={index}
+                        >
                           {(provided, snapshot) => (
                             <Card
-                              className={`mb-3 ${snapshot.isDragging ? 'dragging' : ''}`}
+                              className={`mb-3 ${
+                                snapshot.isDragging ? "dragging" : ""
+                              }`}
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
@@ -218,10 +307,12 @@ const KanbanBoard: React.FC = () => {
                                   <AiOutlineClose
                                     className="shower-theme-icon cursor-pointer"
                                     onMouseOver={(e) =>
-                                      (e.currentTarget.style.transform = 'scale(1.8)')
+                                      (e.currentTarget.style.transform =
+                                        "scale(1.8)")
                                     }
                                     onMouseOut={(e) =>
-                                      (e.currentTarget.style.transform = 'scale(1.1)')
+                                      (e.currentTarget.style.transform =
+                                        "scale(1.1)")
                                     }
                                     onClick={(e) => {
                                       e.stopPropagation(); // Prevent card click from triggering
@@ -259,7 +350,9 @@ const KanbanBoard: React.FC = () => {
                     type="text"
                     name="title"
                     value={selectedTask.title}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      handleChange(e)
+                    }
                   />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formTaskStatus">
@@ -268,7 +361,9 @@ const KanbanBoard: React.FC = () => {
                     as="select"
                     name="status"
                     value={selectedTask.status}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      handleChange(e)
+                    }
                   >
                     <option value="todo">To-do</option>
                     <option value="inProgress">In Progress</option>
@@ -297,7 +392,10 @@ const KanbanBoard: React.FC = () => {
               <Button variant="secondary" onClick={handleCloseModal}>
                 Close
               </Button>
-              <Button variant="dark" onClick={() => handleUpdateTask(selectedDeveloper)}>
+              <Button
+                variant="dark"
+                onClick={() => handleUpdateTask(selectedDeveloper)}
+              >
                 Save Changes
               </Button>
             </Modal.Footer>

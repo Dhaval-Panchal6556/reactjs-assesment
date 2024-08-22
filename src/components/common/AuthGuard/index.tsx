@@ -1,11 +1,8 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-import { useAppSelector } from 'services/redux/store';
-
-import { ROUTES } from 'utils/constants/routes';
-
-import { LoaderWrapper } from '../loader';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "services/redux/store";
+import { ROUTES } from "utils/constants/routes";
+import { LoaderWrapper } from "../loader";
 
 interface AuthGuardProps {
   children: React.ReactNode;

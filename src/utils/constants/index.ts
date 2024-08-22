@@ -22,6 +22,7 @@ export const ApiEndPoints = {
   task: {
     taskAdd: 'task/add',
     taskList: 'task/list',
+    archivedTaskList: 'task/archivedList',
     taskUpdate: 'task/update',
     taskUpdateDetails: 'task/updateTaskDetails',
     delete: 'task/delete'

@@ -22,6 +22,10 @@ export interface IListTaskReq {
   page: number;
   limit: number;
 }
+export interface IArchivedListTaskReq {
+  page: number;
+  limit: number;
+}
 
 export interface IUpdateTaskReq {
   _id: string;
