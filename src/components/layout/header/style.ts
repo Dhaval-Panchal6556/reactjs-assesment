@@ -31,6 +31,22 @@ export const Wrapper = styled.div`
     margin-left: -1100px; /* Adds space between buttons */
   }
 
+  .button-group {
+    display: flex;
+    // flex-direction: column;
+    gap: 10px; /* Adds space between buttons */
+  }
+  
+  .button-group button {
+    // width: 100%; /* Makes the buttons full width within the container */
+  }
+  
+  .centered-username {
+    margin-left: auto;
+    margin-right: 20px; /* Adds some spacing before the logout button */
+  }
+  
+
   .flex-container {
     display: flex;
     justify-content: space-between; /* Distribute space between buttons */

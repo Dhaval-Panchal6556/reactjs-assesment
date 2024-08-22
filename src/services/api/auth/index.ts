@@ -169,6 +169,26 @@ export const authAPI = {
       .finally(() => appLoader(false));
   },
 
+  async developerCountList(data: IDeveloperListReq) {
+    appLoader(true);
+    return apiInstance
+      .post(ApiEndPoints.developer.countList, data, {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(
+            localStorage.getItem('authTokenDemoAppDev') as never
+          )}`
+        }
+      })
+      .then((response) => {
+        // store.dispatch(authSuccess(response));
+        return response;
+      })
+      .catch((error) => {
+        throw error?.response?.data;
+      })
+      .finally(() => appLoader(false));
+  },
+
   async deleteTask(data: IDeleteTaskReq) {
     appLoader(true);
     return apiInstance

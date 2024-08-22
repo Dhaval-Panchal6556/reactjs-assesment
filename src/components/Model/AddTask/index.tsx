@@ -57,7 +57,7 @@ const AddTask: React.FC<IProps> = ({ show, setShow }) => {
 
   const handleClose = () => {
     setShow(false);
-    // setTimeout(() => window.location.reload(), 500); // Reload the page after a short delay
+    setTimeout(() => window.location.reload(), 500); // Reload the page after a short delay
     onSubmit(); // Pass the required argument
   };
 

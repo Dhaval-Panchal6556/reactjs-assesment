@@ -28,7 +28,8 @@ export const ApiEndPoints = {
     delete: 'task/delete'
   },
   developer: {
-    list: 'developer/list'
+    list: 'developer/list',
+    countList: 'developer/countList'
   }
 };
 

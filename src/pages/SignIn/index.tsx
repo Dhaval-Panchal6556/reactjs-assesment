@@ -1,14 +1,10 @@
 import { Wrapper } from "./style";
-
 import { ChangeEvent, useState } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
 import { Navigate, useNavigate } from "react-router-dom";
-
 import Meta from "components/common/Meta";
-
 import { authAPI } from "services/api/auth";
 import { useAppSelector } from "services/redux/store";
-
 import { ROUTES } from "utils/constants/routes";
 
 const SignIn: React.FC = () => {
